@@ -4,3 +4,25 @@
  */
 
 #include "indicator.h"
+
+
+void indicator_init(void)
+{
+	// Indicator will be connected to PORTB pins 15, 14, and 13
+
+	// Enable clock for PORTB
+	RCC->AHB1ENR |= (1U << 1);
+
+	// PORTB.15 is output
+	GPIOB->MODER &= ~(1U << 31);
+	GPIOB->MODER |= (1U << 30);
+
+	// PORTB.14 is output
+	GPIOB->MODER &= ~(1U << 29);
+	GPIOB->MODER |= (1U << 28);
+
+	// PORTB.13 is output
+	GPIOB->MODER &= ~(1U << 27);
+	GPIOB->MODER |= (1U << 26);
+
+}
