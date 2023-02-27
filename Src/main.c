@@ -2,6 +2,7 @@
 #include "stm32f4xx.h"
 #include "indicator.h"
 #include "switch.h"
+#include "sensor.h"
 
 
 int main(void)
@@ -9,8 +10,9 @@ int main(void)
 	light_init();
 	switch_init();
 	light_t light = OFF;
+    
 
-	for(;;)
+	/*for(;;)
 	{
 		if ( button_is_pressed() )
 			light = RED;
@@ -18,5 +20,7 @@ int main(void)
 			light = GREEN;
 
 		set_light(light);
-	}
+	}*/
+    
+    
 }
