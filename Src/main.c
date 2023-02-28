@@ -10,6 +10,13 @@ int main(void)
 	light_init();
 	switch_init();
 	light_t light = OFF;
+
+	while (1)
+	{
+		send_trigger();
+		for(int i = 0; i < 500000; i++){}
+	}
+
     
 
 	/*for(;;)

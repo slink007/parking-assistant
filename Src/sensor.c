@@ -41,7 +41,7 @@ void send_trigger(void)
 	TIM2->CR1 |= (1U << 0);
     
     // Drive trigger output high for 10 uS then bring it back low again.
-    GPIOB-> |= TRIGGER_PIN;
+    GPIOB->ODR |= TRIGGER_PIN;
     while (!(TIM2->SR & SR_UIF)) {}
     GPIOB->ODR  &= ~TRIGGER_PIN;
     
