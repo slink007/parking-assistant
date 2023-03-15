@@ -26,25 +26,28 @@ void trigger_timer_init(void)
 {
     // Enable clock access to TIM2
 	RCC->APB1ENR |= (1U << 0);
-    
-    // Need 16 counts for a 10 uS pulse
-    TIM2->ARR = 16 - 1;
+
+    // 10 uS / (1 / 16 MHz) = count of 160
+	// Experimentation shows that 162 needed to ensure a 10 uS pulse
+	TIM2->ARR = 162;
     
     // Clear current count to ensure we get a correct count
 	TIM2->CNT = 0;
+
+	// Enable TIM2
+	TIM2->CR1 |= (1U << 0);
 }
 
 
 void send_trigger(void)
 {
-    // Enable TIM2
-	TIM2->CR1 |= (1U << 0);
+    // Reset the timer
+	TIM2->CNT = 0;
+	TIM2->SR &= ~(1U << 0);
+
     
     // Drive trigger output high for 10 uS then bring it back low again.
     GPIOB->ODR |= TRIGGER_PIN;
     while (!(TIM2->SR & SR_UIF)) {}
     GPIOB->ODR  &= ~TRIGGER_PIN;
-    
-    // Disable TIM2
-	TIM2->CR1 &= ~(1U << 0);
 }

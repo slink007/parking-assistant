@@ -9,12 +9,13 @@ int main(void)
 {
 	light_init();
 	switch_init();
-	light_t light = OFF;
+	//light_t light = OFF;
+	sensor_init();
 
 	while (1)
 	{
 		send_trigger();
-		for(int i = 0; i < 500000; i++){}
+		for(int i = 0; i < 500; i++){}
 	}
 
     
