@@ -15,7 +15,7 @@ int main(void)
 	while (1)
 	{
 		send_trigger();
-		for(int i = 0; i < 500; i++){}
+		for(int i = 0; i < 5000; i++){}
 	}
 
     
