@@ -3,11 +3,9 @@
 
 #include "stm32f4xx.h"
 
-#define TRIGGER_PIN		(1U << 10)
-#define SR_UIF			(1U << 0)
 
 void sensor_init(void);
+int get_distance(void);
 void send_trigger(void);
-
 
 #endif /* SENSOR_H_ */
