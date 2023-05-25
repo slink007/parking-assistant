@@ -49,7 +49,8 @@ int main(void)
 	sensor_init();
 	set_light(RED);
 
-	int dist_count = 0;
+	//int dist_count = 0;
+	struct reading distance;
 
 	/*Enable clock access to GPIOA */
 	RCC->AHB1ENR |= (1U << 0);
@@ -64,8 +65,9 @@ int main(void)
 	{
 		GPIOB->ODR ^= RED_LED;
 		systickDelayMs(1000);     // delay 1 second
-		dist_count = get_distance();
-		printf("A-to-D count is %d\r\n", dist_count);
+		//dist_count = get_distance();
+		distance = get_distance();
+		printf("A-to-D count is %d\r\n", distance.count);
 		// for(int i = 0; i < 5000; i++){}
 	}
 

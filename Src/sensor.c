@@ -96,10 +96,12 @@ void send_trigger(void)
 }
 
 
-int get_distance(void)
+// int get_distance(void)
+struct reading get_distance(void)
 {
 	int rising_edge = 0;
 	int falling_edge = 0;
+	struct reading echo = {.count = 0, .result = GOOD};
 	
 	send_trigger();
 	TIM3->CNT = 0;
@@ -112,5 +114,7 @@ int get_distance(void)
 	while(!(TIM3->SR & (1U<<1))){}
 	falling_edge = TIM3->CCR1;
 	
-	return (falling_edge - rising_edge);
+	echo.count = (falling_edge - rising_edge);
+	// return (falling_edge - rising_edge);
+	return echo;
 }
