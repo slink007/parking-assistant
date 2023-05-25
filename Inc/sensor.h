@@ -6,6 +6,5 @@
 
 void sensor_init(void);
 int get_distance(void);
-void send_trigger(void);
 
 #endif /* SENSOR_H_ */

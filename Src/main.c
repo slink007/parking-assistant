@@ -66,9 +66,6 @@ int main(void)
 		systickDelayMs(1000);     // delay 1 second
 		dist_count = get_distance();
 		printf("A-to-D count is %d\r\n", dist_count);
-
-		//send_trigger();
-
 		// for(int i = 0; i < 5000; i++){}
 	}
 

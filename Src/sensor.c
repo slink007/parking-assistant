@@ -67,14 +67,13 @@ void echo_timer_init(void)
 
 	RCC->APB1ENR |= TIM3EN;        // Enable clock access to TIM3
 	
-	TIM3->PSC = 1600 - 1;          // Divide down APB1 clock
-							       // 16 MHz / 1600 = 10 kHz, so 0.1 mS per tick
+	TIM3->PSC = 160 - 1;           // 16 MHz / 160 = 100 kHz, so 0.01 mS per tick
+
+	// Timer counts UP as God intended
+	TIM3->CR1 |= (1U << 4);
 
 	TIM3->CCMR1 &= ~(1U << 1);     // TIM3 set for input capture
 	TIM3->CCMR1 |= (1U << 0);
-
-	// TIM3->CCER &= ~(1U << 1);      // Input capture enabled and triggered
-	// TIM3->CCER |= (1U << 0);       // on rising edge.
 
 	TIM3->CCER |= (1U << 1);      // Input capture enabled and triggered
 	TIM3->CCER |= (1U << 0);      // on rising and falling edges.
@@ -89,7 +88,6 @@ void send_trigger(void)
     // Reset the timer
 	TIM2->CNT = 0;
 	TIM2->SR &= ~(1U << 0);
-
     
     // Drive trigger output high for 10 uS then bring it back low again.
     GPIOB->ODR |= TRIGGER_PIN;
@@ -104,21 +102,15 @@ int get_distance(void)
 	int falling_edge = 0;
 	
 	send_trigger();
-	//TIM3->CR1 |= (1U << 0);
 	TIM3->CNT = 0;
 	
 	// wait for, and capture, rising edge of echo
 	while(!(TIM3->SR & (1U<<1))){}
-	//while(!(TIM3->SR & (1U<<0))){}
 	rising_edge = TIM3->CCR1;
 	
 	// wait for, and capture, falling edge of echo
 	while(!(TIM3->SR & (1U<<1))){}
-	//while(!(TIM3->SR & (1U<<0))){}
 	falling_edge = TIM3->CCR1;
 	
-	//TIM3->CR1 &= ~(1U << 0);
-	//return (falling_edge - rising_edge);
-	return (rising_edge - falling_edge);
-	//return rising_edge;
+	return (falling_edge - rising_edge);
 }
