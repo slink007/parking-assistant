@@ -10,7 +10,6 @@
 #define YELLOW_LED		(1U << 14)
 #define RED_LED			(1U << 13)
 #define ERROR_LED       (GREEN_LED | YELLOW_LED | RED_LED)
-#define LIGHT_OFF		0x1FFF   // all bits for light are 0, so this is OFF condition
 #define RED_COUNT		3552     // 12" at a echo clock of 2 MHz
 #define YELLOW_COUNT	10656    // 36" at a echo clock of 2 MHz
 
@@ -44,10 +43,13 @@ void light_off(void)
 	GPIOB->ODR &= ~(RED_LED);
 }
 
-//void set_light(light_t light)
+
 void set_light(struct reading sensor)
 {
-	uint32_t temp = GPIOB->ODR & LIGHT_OFF;
+	uint32_t temp = GPIOB->ODR;
+	static int red_confidence = 0;
+	static int yellow_confidence = 0;
+	static int green_confidence = 0;
 
 	if (sensor.result == BAD)
 	{
@@ -55,19 +57,49 @@ void set_light(struct reading sensor)
 	}
 	else
 	{
+		/* The sensor tends to be noisy, especially when the target is moving. The noise is severe enough that
+		 * you wind up briefly changing the indicator state.  To deal with this problem I am using a version
+		 * of the switch debounce code from sensor.c.  Now we must get 5 counts for a given indicator state
+		 * before any changes are made to the sensor.
+		 */
 		if (sensor.count < RED_COUNT)
 		{
-			temp |= RED_LED;
+			red_confidence += 1;
 		}
 		else if (sensor.count < YELLOW_COUNT)
 		{
-			temp |= YELLOW_LED;
+			yellow_confidence += 1;
 		}
 		else
 		{
-			temp |= GREEN_LED;
+			green_confidence += 1;
 		}
-	}
 
+		if ( (red_confidence > 4) || (yellow_confidence > 4) || (green_confidence > 4) )
+		{
+			if (red_confidence > 4)
+			{
+				temp |= RED_LED;
+				temp &= ~YELLOW_LED;
+				temp &= ~GREEN_LED;
+			}
+			else if (yellow_confidence > 4)
+			{
+				temp &= ~RED_LED;
+				temp |= YELLOW_LED;
+				temp &= ~GREEN_LED;
+			}
+			else
+			{
+				temp &= ~RED_LED;
+				temp &= ~YELLOW_LED;
+				temp |= GREEN_LED;
+			}
+			red_confidence = 0;
+			yellow_confidence = 0;
+			green_confidence = 0;
+		}
+
+	}
 	GPIOB->ODR = temp;
 }

@@ -61,9 +61,10 @@ int main(void)
 
 	while (1)
 	{
-		if ( switch_is_opened() )
+		//if ( switch_is_opened() )
+		if ( 1 == 1 )
 		{
-			systickDelayMs(500);
+			systickDelayMs(100);
 			distance = get_distance();
 			printf("A-to-D count is %d\r\n", distance.count);  // debug
 			set_light(distance);
