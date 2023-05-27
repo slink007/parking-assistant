@@ -67,7 +67,7 @@ void echo_timer_init(void)
 
 	RCC->APB1ENR |= TIM3EN;        // Enable clock access to TIM3
 	
-	TIM3->PSC = 160 - 1;           // 16 MHz / 160 = 100 kHz, so 0.01 mS per tick
+	TIM3->PSC = 8 - 1;             // 16 MHz / 8 = 2 MHz, so 0.5 uS per tick
 
 	// Timer counts UP as God intended
 	TIM3->CR1 |= (1U << 4);

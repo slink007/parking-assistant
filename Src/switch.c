@@ -1,6 +1,6 @@
 #include "switch.h"
 
-volatile unsigned int pressed = 0;
+volatile unsigned int closed = 0;
 
 void switch_init(void)
 {
@@ -33,38 +33,38 @@ void switch_init(void)
 }
 
 
-unsigned int button_is_pressed(void)
+unsigned int switch_is_opened(void)
 {
-    return pressed;
+    return closed;
 }
 
 
 static void exti_callback(void)
 {
-    int pressed_confidence = 0;
-    int released_confidence = 0;
+    int closed_confidence = 0;
+    int opened_confidence = 0;
 
     while(1)
     {
-        // button not pressed
+        // switch not closed
         if(GPIOB->IDR & (1U << 1))
         {
-            released_confidence++;
-            pressed_confidence = 0;
-            if (released_confidence > 500)
+            opened_confidence++;
+            closed_confidence = 0;
+            if (opened_confidence > 500)
             {
-                pressed = 0;
+                closed = 0;
                 break;
             }
         }
-        // button pressed
+        // switch closed
         else
         {
-            pressed_confidence++;
-            released_confidence = 0;
-            if (pressed_confidence > 500)
+            closed_confidence++;
+            opened_confidence = 0;
+            if (closed_confidence > 500)
             {
-                pressed = 1;
+                closed = 1;
                 break;
             }
         }

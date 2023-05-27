@@ -45,14 +45,11 @@ int main(void)
 {
 	light_init();
 	switch_init();
-	//light_t light = OFF;
 	sensor_init();
-	set_light(RED);
 
-	//int dist_count = 0;
 	struct reading distance;
 
-	/*Enable clock access to GPIOA */
+	/* Needed to send debug info out serial port */
 	RCC->AHB1ENR |= (1U << 0);
 
 	/*Set PA5 as output pin*/
@@ -60,30 +57,20 @@ int main(void)
 	GPIOA->MODER &=~(1U << 11);
 
 	uart2_tx_init();
+	/* End serial port debug section */
 
 	while (1)
 	{
-		GPIOB->ODR ^= RED_LED;
-		systickDelayMs(1000);     // delay 1 second
-		//dist_count = get_distance();
-		distance = get_distance();
-		printf("A-to-D count is %d\r\n", distance.count);
-		// for(int i = 0; i < 5000; i++){}
-	}
-
-    
-
-	/*for(;;)
-	{
-		if ( button_is_pressed() )
-			light = RED;
+		if ( switch_is_opened() )
+		{
+			systickDelayMs(500);
+			distance = get_distance();
+			printf("A-to-D count is %d\r\n", distance.count);  // debug
+			set_light(distance);
+		}
 		else
-			light = GREEN;
-
-		set_light(light);
-	}*/
-    
-    
+			light_off();
+	}
 }
 
 
