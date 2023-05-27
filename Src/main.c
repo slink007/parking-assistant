@@ -61,8 +61,7 @@ int main(void)
 
 	while (1)
 	{
-		//if ( switch_is_opened() )
-		if ( 1 == 1 )
+		if ( switch_is_opened() )
 		{
 			systickDelayMs(100);
 			distance = get_distance();
