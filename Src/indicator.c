@@ -103,3 +103,12 @@ void set_light(struct reading sensor)
 	}
 	GPIOB->ODR = temp;
 }
+
+
+void test_lights(void)
+{
+	struct reading test = {.count = 0, .result = BAD};
+	set_light(test);
+	systickDelayMs(1000);
+	light_off();
+}

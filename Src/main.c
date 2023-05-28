@@ -3,6 +3,7 @@
 #include "indicator.h"
 #include "switch.h"
 #include "sensor.h"
+#include "delay.h"
 
 /* Added solely for testing over serial port */
 #include <stdio.h>
@@ -29,23 +30,13 @@ int __io_putchar(int ch);
 
 
 
-/* Added for 1 second delay */
-// #include "systick.h"
-#define SYSTICK_LOAD_VAL          16000
-#define CTRL_ENABLE               (1U << 0)
-#define CTRL_CLKSRC               (1U << 2)
-#define CTRL_COUNTFLAG            (1U << 16)
-
-void systickDelayMs(int delay);
-/*****************************/
-
-
-
 int main(void)
 {
 	light_init();
 	switch_init();
 	sensor_init();
+
+	test_lights();
 
 	struct reading distance;
 
@@ -139,17 +130,3 @@ int __io_putchar(int ch)
 
 
 
-/* for 1 second delay */
-void systickDelayMs(int delay)
-{
-	SysTick->LOAD = SYSTICK_LOAD_VAL;  // reload with clocks per millisecond
-	SysTick->VAL = 0;  // clear current count value
-	SysTick->CTRL = CTRL_ENABLE | CTRL_CLKSRC;  // enable timer and use internal clock source
-
-	for(int i = 0; i < delay; i++)
-	{
-		while((SysTick->CTRL & CTRL_COUNTFLAG) == 0){}  // wait for COUNTFLAG to be set
-	}
-	SysTick->CTRL = 0;
-	SysTick->CTRL &= ~(CTRL_ENABLE);
-}

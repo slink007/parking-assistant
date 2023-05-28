@@ -14,5 +14,6 @@
 void light_init(void);
 void set_light(struct reading);
 void light_off(void);
+void test_lights(void);
 
 #endif /* INDICATOR_H_ */
