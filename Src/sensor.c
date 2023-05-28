@@ -6,11 +6,12 @@
 #define SR_UIF			(1U << 0)
 #define GPIOAEN		    (1U << 0)
 #define TIM3EN		    (1U << 1)
+#define SR_UIF          (1U << 0)
 
 
 void trigger_timer_init(void);
 void echo_timer_init(void);
-
+int reading_was_good(void);
 
 /*  Set up pins for interfacing with HC-SR04 sensor */
 void sensor_init(void)
@@ -103,15 +104,30 @@ struct reading get_distance(void)
 	struct reading echo = {.count = 0, .result = GOOD};
 	
 	send_trigger();
-	TIM3->CNT = 0;
+	TIM3->CNT = 0;        // make sure we start counting from zero
+	TIM3->SR &= ~SR_UIF;  // clear roll over/under flag
 	
-	// wait for, and capture, rising edge of echo
-	while(!(TIM3->SR & (1U<<1))){}
-	rising_edge = TIM3->CCR1;
+	// check for rising edge of echo pulse
+	if ( reading_was_good() )
+	{
+		rising_edge = TIM3->CCR1;
+	}
+	else
+	{
+		echo.result = BAD;
+		return echo;
+	}
 	
-	// wait for, and capture, falling edge of echo
-	while(!(TIM3->SR & (1U<<1))){}
-	falling_edge = TIM3->CCR1;
+	// check for falling edge of echo pulse
+	if ( reading_was_good() )
+	{
+		falling_edge = TIM3->CCR1;
+	}
+	else
+	{
+		echo.result = BAD;
+		return echo;
+	}
 	
 	echo.count = (falling_edge - rising_edge);
 
@@ -133,4 +149,17 @@ struct reading get_distance(void)
 	}
 
 	return echo;
+}
+
+
+int reading_was_good(void)
+{
+	// wait for and capture edge of echo pulse
+	while( !(TIM3->SR & (1U<<1)) && !(TIM3->SR & SR_UIF) ){}
+
+	if (TIM3->SR & SR_UIF)  // sensor was unresponsive and timer rolled over
+	{
+		return 0;
+	}
+	return 1;
 }

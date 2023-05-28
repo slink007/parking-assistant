@@ -59,7 +59,7 @@ void set_light(struct reading sensor)
 	{
 		/* The sensor tends to be noisy, especially when the target is moving. The noise is severe enough that
 		 * you wind up briefly changing the indicator state.  To deal with this problem I am using a version
-		 * of the switch debounce code from sensor.c.  Now we must get 5 counts for a given indicator state
+		 * of the switch debounce code from sensor.c.  Now we must get 4 counts for a given indicator state
 		 * before any changes are made to the sensor.
 		 */
 		if (sensor.count < RED_COUNT)
@@ -75,15 +75,15 @@ void set_light(struct reading sensor)
 			green_confidence += 1;
 		}
 
-		if ( (red_confidence > 4) || (yellow_confidence > 4) || (green_confidence > 4) )
+		if ( (red_confidence > 3) || (yellow_confidence > 3) || (green_confidence > 3) )
 		{
-			if (red_confidence > 4)
+			if (red_confidence > 3)
 			{
 				temp |= RED_LED;
 				temp &= ~YELLOW_LED;
 				temp &= ~GREEN_LED;
 			}
-			else if (yellow_confidence > 4)
+			else if (yellow_confidence > 3)
 			{
 				temp &= ~RED_LED;
 				temp |= YELLOW_LED;
