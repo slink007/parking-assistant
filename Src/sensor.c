@@ -66,10 +66,9 @@ void echo_timer_init(void)
 
 
 	RCC->APB1ENR |= TIM3EN;        // Enable clock access to TIM3
-	
 	TIM3->PSC = 8 - 1;             // 16 MHz / 8 = 2 MHz, so 0.5 uS per tick
 
-	// Timer counts UP as God intended
+	// Timer counts UP
 	TIM3->CR1 |= (1U << 4);
 
 	TIM3->CCMR1 &= ~(1U << 1);     // TIM3 set for input capture
@@ -115,6 +114,23 @@ struct reading get_distance(void)
 	falling_edge = TIM3->CCR1;
 	
 	echo.count = (falling_edge - rising_edge);
-	// return (falling_edge - rising_edge);
+
+	/*
+	 * For reasons unknown, the STM32F does not apply the command to make TIM3 an up counter
+	 * when it is powered on.  This results in negative count values.  If a manual reset is
+	 * performed then the counter will operate as expected until the device experiences another
+	 * power cycle.  The following deals with those negative counts until a reason can be found
+	 * for why it behaves one way on power up and another way following a reset.
+	 *
+	 * I tried working around this by just letting the timer be a down counter and reversing the
+	 * order of the counts when calculating the difference.  This did give me a positive count
+	 * on power up but then all counts go negative on a reset.  It seems there is no escaping
+	 * this hack.
+	 */
+	if (echo.count < 0)
+	{
+		echo.count *= -1;
+	}
+
 	return echo;
 }
